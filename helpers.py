@@ -47,7 +47,9 @@ __all__ = ['find_project_by_short_name', 'check_api_error',
            '_delete_tasks', 'enable_auto_throttling',
            '_update_tasks_redundancy',
            '_update_project_watch', 'PbsHandler',
-           '_update_task_presenter_bundle_js', 'row_empty',
+           '_update_task_presenter_bundle_js',
+           '_update_task_presenter_bundle_css',
+           'row_empty',
            '_add_helpingmaterials', 'create_helping_material_info']
 
 
@@ -97,6 +99,19 @@ def _update_task_presenter_bundle_js(project):
             js = f.read()
         project.info['task_presenter'] += "<script>\n%s\n</script>" % js
 
+def _update_task_presenter_bundle_css(project):
+    """Append to template a distribution bundle css."""
+    if os.path.isfile ('bundle.min.css'):
+        with open('bundle.min.css') as f:
+            css = f.read()
+        project.info['task_presenter'] = ( "<style>\n%s\n</style>" % css ) + project.info['task_presenter']
+        return
+
+    if os.path.isfile ('bundle.css'):
+        with open('bundle.css') as f:
+            css = f.read()
+        project.info['task_presenter'] = ( "<style>\n%s\n</style>" % css ) + project.info['task_presenter']
+
 def _update_project(config, task_presenter, results,
                     long_description, tutorial):
     """Update a project."""
@@ -116,6 +131,7 @@ def _update_project(config, task_presenter, results,
         with open(task_presenter, 'r') as f:
             project.info['task_presenter'] = f.read()
         _update_task_presenter_bundle_js(project)
+        _update_task_presenter_bundle_css(project)
         # Update results
         with open(results, 'r') as f:
             project.info['results'] = f.read()
@@ -443,7 +459,8 @@ class PbsHandler(PatternMatchingEventHandler):
 
     patterns = ['*/template.html', '*/tutorial.html',
                 '*/long_description.md', '*/results.html',
-                '*/bundle.js', '*/bundle.min.js']
+                '*/bundle.js', '*/bundle.min.js',
+                '*/bundle.css', '*/bundle.min.css']
 
     def __init__(self, config, task_presenter, results,
                  long_description, tutorial):
