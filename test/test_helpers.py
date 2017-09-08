@@ -117,7 +117,8 @@ class TestHelpers(TestDefault):
         obj = PbsHandler(None, None, None, None, None)
         patterns = ['*/template.html', '*/tutorial.html',
                     '*/long_description.md', '*/results.html',
-                    '*/bundle.js', '*/bundle.min.js']
+                    '*/bundle.js', '*/bundle.min.js',
+                    '*/bundle.css', '*/bundle.min.css']
         assert obj.patterns == patterns, obj.patterns
 
     @patch('helpers._update_project')
@@ -145,6 +146,19 @@ class TestHelpers(TestDefault):
         assert project.info['task_presenter'] == presenter, err_msg
 
     @patch('helpers.os.path.isfile')
+    def test_update_bundle_css(self, mock):
+        """Test update task presenter with bundle css."""
+        mock.return_value = False
+        presenter = '<div></div>'
+        project_dict = dict(short_name='foo',
+                            id=1,
+                            info={'task_presenter': presenter})
+        project = pbclient.Project(project_dict)
+        _update_task_presenter_bundle_css(project)
+        err_msg = "There should not be any CSS as there is no bundle.css or bundle.min.css"
+        assert project.info['task_presenter'] == presenter, err_msg
+
+    @patch('helpers.os.path.isfile')
     def test_update_not_bundle_js(self, mock):
         """Test update task presenter with bundle js."""
         mock.return_value = False
@@ -155,6 +169,19 @@ class TestHelpers(TestDefault):
         project = pbclient.Project(project_dict)
         _update_task_presenter_bundle_js(project)
         err_msg = "There should not be any JS as there is no bundle.js or bundle.min.js"
+        assert project.info['task_presenter'] == presenter, err_msg
+
+    @patch('helpers.os.path.isfile')
+    def test_update_not_bundle_css(self, mock):
+        """Test update task presenter with bundle css."""
+        mock.return_value = False
+        presenter = '<div></div>'
+        project_dict = dict(short_name='foo',
+                            id=1,
+                            info={'task_presenter': presenter})
+        project = pbclient.Project(project_dict)
+        _update_task_presenter_bundle_css(project)
+        err_msg = "There should not be any CSS as there is no bundle.css or bundle.min.css"
         assert project.info['task_presenter'] == presenter, err_msg
 
     @patch('helpers.os.path.isfile')
@@ -176,6 +203,24 @@ class TestHelpers(TestDefault):
         assert js in project.info['task_presenter'], err_msg
 
     @patch('helpers.os.path.isfile')
+    def test_update_bundle_css(self, mock):
+        """Test update task presenter with bundle css."""
+        items = [False, True]
+        def return_effect(*args):
+            return items.pop(0)
+        mock.side_effect = return_effect
+        presenter = '<div></div>'
+        project_dict = dict(short_name='foo',
+                            id=1,
+                            info={'task_presenter': presenter})
+        project = pbclient.Project(project_dict)
+        _update_task_presenter_bundle_css(project)
+        with open('bundle.css') as f:
+            css = f.read()
+        err_msg = "There should be the content of bundle.css"
+        assert css in project.info['task_presenter'], err_msg
+
+    @patch('helpers.os.path.isfile')
     def test_update_bundle_min_js(self, mock):
         """Test update task presenter with bundle.min.js."""
         items = [True, False]
@@ -192,3 +237,21 @@ class TestHelpers(TestDefault):
             js = f.read()
         err_msg = "There should be the content of bundle.min.js"
         assert js in project.info['task_presenter'], err_msg
+
+    @patch('helpers.os.path.isfile')
+    def test_update_bundle_min_css(self, mock):
+        """Test update task presenter with bundle.min.css."""
+        items = [True, False]
+        def return_effect(*args):
+            return items.pop(0)
+        mock.side_effect = return_effect
+        presenter = '<div></div>'
+        project_dict = dict(short_name='foo',
+                            id=1,
+                            info={'task_presenter': presenter})
+        project = pbclient.Project(project_dict)
+        _update_task_presenter_bundle_css(project)
+        with open('bundle.min.css') as f:
+            css = f.read()
+        err_msg = "There should be the content of bundle.min.css"
+        assert css in project.info['task_presenter'], err_msg

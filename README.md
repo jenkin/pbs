@@ -197,6 +197,15 @@ In order to use this solution, just transpile to a file named bundle.js or bundl
 **NOTE** If there's a minified version of the file, bundle.min.js, that file will be always used
 instead of bundle.js. 
 
+### Using an external CSS file
+
+Since pbs >= 2.3.0, pbs will check for an external CSS file named *bundle.css*
+or *bundle.min.css*. If any of those files exist, then, they will be added at the top
+of your template (like you have been doing so far with your projects).
+
+**NOTE** If there's a minified version of the file, bundle.min.css, that file will be always used
+instead of bundle.css. 
+
 ### Auto-updating while developing a PYBOSSA project
 
 At some point you will end up running lots of pbs update_project commands, as 
